@@ -1,0 +1,9 @@
+{
+    "events": {
+        "restart": "npm run build && node ./lib/Bot.js"
+    },
+    "ext": "js, json, ts",
+    "watch": [
+        "src"
+    ]
+}
