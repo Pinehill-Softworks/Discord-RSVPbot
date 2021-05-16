@@ -8,7 +8,7 @@ export default (message: Discord.Message) => {
       break;
     }
     case message.content.includes("#pong"): {
-      console.log("dumb user");
+      console.log("recieved ping from dumb user");
       message.channel.send("ping?");
       break;
     }
