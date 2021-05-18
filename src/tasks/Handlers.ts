@@ -9,5 +9,5 @@ export default (client: Discord.Client) => {
     }
   });
 
-  //client.on("message", (message) => console.log(message));
+  // client.on("message", (message) => console.log(message.channel));
 };
