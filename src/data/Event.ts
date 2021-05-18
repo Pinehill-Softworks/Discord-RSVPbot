@@ -5,10 +5,11 @@ class ScheduledEvent {
   Title: string;
   Description: string;
   Date?: DateTime;
+  ChannelID?: string;
 
   constructor(title: string, description?: string, date?: DateTime) {
-    // @ts-ignore
-    this.Name = title.trim().replaceAll(" ", "-");
+    // @ts-ignore : TS doesnt have replaceAll?
+    this.Name = title.trim().toLowerCase().replaceAll(" ", "-");
     this.Title = title;
     this.Description = description || "";
     this.Date = date || undefined;
@@ -28,6 +29,17 @@ class ScheduledEvent {
     if (date > DateTime.now() || date === null) {
       this.Date = date;
     }
+  }
+
+  setChannelID(id: string) {
+    this.ChannelID = id;
+  }
+
+  getChannelName() {
+    const dateToPrint = this.Date
+      ? this.Date.toFormat(`M-d${DateTime.now().year !== this.Date.year ? "-y" : ""}`)
+      : null;
+    return `${this.Title}${dateToPrint ? `-${dateToPrint}` : ""}`;
   }
 }
 
