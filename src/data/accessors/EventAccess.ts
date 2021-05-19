@@ -1,5 +1,5 @@
 import { Database } from "sqlite3";
-import ScheduledEvent from "./Event";
+import ScheduledEvent from "../entities/Event";
 
 export default (
   database: string,
