@@ -14,8 +14,14 @@ export default (message: Discord.Message) => {
       .Events()
       .Get(words[eventIndex + 1], (event) => {
         if (event) {
-          if (words.includes("#print")) {
-            message.channel.send(JSON.stringify(event));
+          switch (true) {
+            case words.includes("#print"): {
+              message.channel.send(JSON.stringify(event));
+              break;
+            }
+            case words.includes("#rename"): {
+              break;
+            }
           }
         } else {
           console.log("creating new event");
