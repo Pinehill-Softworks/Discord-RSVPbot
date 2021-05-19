@@ -26,18 +26,20 @@ const log = (message: string): ((err: Error | null) => void) => {
 export default (id: string) => {
   const path = () => `${constants.DATABASE_FILE_LOCATION}/${id}.db`;
 
-  const execute = (actions: (db: Database) => void) => {
-    let shouldGenerate = !fs.existsSync(path());
-    const db = new sqlite.Database(path(), log(`Connecting to database for server ${id}`));
+  const execute = (actions: (db: Database, resolve: Function, reject: Function) => void): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      let shouldGenerate = !fs.existsSync(path());
+      const db = new sqlite.Database(path(), log(`Connecting to database for server ${id}`));
 
-    db.serialize(() => {
-      if (shouldGenerate) {
-        generateTables(db);
-      }
-      actions(db);
+      db.serialize(() => {
+        if (shouldGenerate) {
+          generateTables(db);
+        }
+        actions(db, resolve, reject);
+      });
+
+      db.close(log(`Closed database for server ${id}`));
     });
-
-    db.close(log(`Closed database for server ${id}`));
   };
 
   return {
@@ -52,14 +54,14 @@ export default (id: string) => {
             5: event.ChannelID,
           });
         }),
-      Get: (name: string, callback: (result: Event) => void) => {
-        return execute((db) => {
+      Get: (name: string) => {
+        return execute((db, resolve, reject) => {
           console.log(name);
           db.get("SELECT * FROM Events WHERE Name = ?", [name], (error, row) => {
             if (error) {
-              console.log(error);
+              reject(error);
             }
-            callback(row);
+            resolve(row);
           });
         });
       },
