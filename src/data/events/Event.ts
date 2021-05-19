@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import Store from "./Store";
+import Store from "../Store";
 
 class ScheduledEvent {
   private _id: number;
@@ -71,11 +71,10 @@ class ScheduledEvent {
   commitChanges() {
     if (this.Id <= 0) {
       Store(this.Server)
-        .Events()
-        .Add(this)
+        .Events.Add(this)
         .then((id) => (this._id = id));
     } else {
-      Store(this.Server).Events().Update(this);
+      Store(this.Server).Events.Update(this);
     }
   }
 }
@@ -89,11 +88,10 @@ export interface ScheduledEventConstructor {
   ChannelID?: string;
 }
 
-export const GetEventByID = async (server: string, id: number) => await Store(server).Events().GetByID(id);
+export const GetEventByID = async (server: string, id: number) => await Store(server).Events.GetByID(id);
 
-export const GetEventByName = async (server: string, name: string) => await Store(server).Events().GetByName(name);
+export const GetEventByName = async (server: string, name: string) => await Store(server).Events.GetByName(name);
 
-export const GetEventByChannelID = async (server: string, id: string) =>
-  await Store(server).Events().GetByChannelID(id);
+export const GetEventByChannelID = async (server: string, id: string) => await Store(server).Events.GetByChannelID(id);
 
 export default ScheduledEvent;

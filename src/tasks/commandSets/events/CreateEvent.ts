@@ -1,8 +1,6 @@
 import { DMChannel, Message, NewsChannel, TextChannel } from "discord.js";
-import { DateTime } from "luxon";
 
-import ScheduledEvent, { ScheduledEventConstructor } from "../../../data/Event";
-import Store from "../../../data/Store";
+import ScheduledEvent, { ScheduledEventConstructor } from "../../../data/events/Event";
 import { AddSiblingChannelToGuild } from "../../ChannelManagement";
 
 export default (words: Array<string>, message: Message): string => {

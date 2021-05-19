@@ -10,9 +10,9 @@ export default async (message: Discord.Message) => {
   // user interacting with a specific event
   const eventIndex = words.indexOf("#event");
   if (eventIndex >= 0 && eventIndex + 1 < words.length) {
-    const event = await Store((message.channel as Discord.TextChannel | Discord.NewsChannel).guild.id)
-      .Events()
-      .GetByName(words[eventIndex + 1]);
+    const event = await Store((message.channel as Discord.TextChannel | Discord.NewsChannel).guild.id).Events.GetByName(
+      words[eventIndex + 1]
+    );
 
     if (event) {
       switch (true) {
