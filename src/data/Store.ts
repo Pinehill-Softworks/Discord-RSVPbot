@@ -26,30 +26,24 @@ const log = (message: string): ((err: Error | null) => void) => {
 export default (id: string) => {
   const path = () => `${constants.DATABASE_FILE_LOCATION}/${id}.db`;
 
-  const execute = (actions: (db: Database, result: Array<any>) => void) => {
+  const execute = (actions: (db: Database) => void) => {
     let shouldGenerate = !fs.existsSync(path());
     const db = new sqlite.Database(path(), log(`Connecting to database for server ${id}`));
-    const result: Array<any> = [];
 
     db.serialize(() => {
       if (shouldGenerate) {
         generateTables(db);
       }
-      actions(db, result);
+      actions(db);
     });
 
     db.close(log(`Closed database for server ${id}`));
-
-    return result;
   };
-
-  if (!fs.existsSync(path())) {
-  }
 
   return {
     Events: () => ({
       Add: (event: Event) =>
-        execute((db, result) => {
+        execute((db) => {
           db.run("INSERT INTO Events (Name, Title, Description, Date, ChannelID) VALUES (?1, ?2, ?3, ?4, ?5)", {
             1: event.Name,
             2: event.Title,
@@ -58,6 +52,17 @@ export default (id: string) => {
             5: event.ChannelID,
           });
         }),
+      Get: (name: string, callback: (result: Event) => void) => {
+        return execute((db) => {
+          console.log(name);
+          db.get("SELECT * FROM Events WHERE Name = ?", [name], (error, row) => {
+            if (error) {
+              console.log(error);
+            }
+            callback(row);
+          });
+        });
+      },
     }),
   };
 };
