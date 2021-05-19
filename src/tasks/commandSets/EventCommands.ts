@@ -12,7 +12,7 @@ export default async (message: Discord.Message) => {
   if (eventIndex >= 0 && eventIndex + 1 < words.length) {
     const event = await Store((message.channel as Discord.TextChannel | Discord.NewsChannel).guild.id)
       .Events()
-      .Get(words[eventIndex + 1]);
+      .GetByName(words[eventIndex + 1]);
 
     if (event) {
       switch (true) {
