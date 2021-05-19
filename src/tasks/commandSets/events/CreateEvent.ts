@@ -2,7 +2,7 @@ import { DMChannel, Message, NewsChannel, TextChannel } from "discord.js";
 import { DateTime } from "luxon";
 
 import ScheduledEvent from "../../../data/Event";
-import { EVENTS } from "../../../data/Store";
+import Store from "../../../data/Store";
 import { AddSiblingChannelToGuild } from "../../ChannelManagement";
 
 export default (words: Array<string>, message: Message): string => {
@@ -49,7 +49,12 @@ export default (words: Array<string>, message: Message): string => {
       }
     }
 
-    EVENTS.push(event);
+    if (!(message.channel as DMChannel).recipient) {
+      Store((message.channel as TextChannel | NewsChannel).guild.id)
+        .Events()
+        .Add(event);
+    }
+
     return JSON.stringify(event);
   } else {
     return "Please specify an event to be added or changed.";
