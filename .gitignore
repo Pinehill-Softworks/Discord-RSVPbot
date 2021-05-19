@@ -36,6 +36,7 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+lib
 
 # Dependency directories
 node_modules/
@@ -75,6 +76,8 @@ web_modules/
 Token.ts
 Token.d.ts
 Token.js
+
+servers/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
