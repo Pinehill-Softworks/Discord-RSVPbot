@@ -2,9 +2,9 @@ import sqlite, { Database } from "sqlite3";
 import fs from "fs";
 
 import * as constants from "../CONSTANTS";
-import Event from "./events/Event";
-import ScheduledEvent from "./events/Event";
-import EventAccess from "./events/EventAccess";
+import Event from "./entities/Event";
+import ScheduledEvent from "./entities/Event";
+import EventAccess from "./accessors/EventAccess";
 
 const generateTables = (db: Database) => {
   db.serialize(() => {

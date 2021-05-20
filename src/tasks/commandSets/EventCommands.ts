@@ -2,6 +2,7 @@ import * as Discord from "discord.js";
 import { DateTime } from "luxon";
 
 import Store from "../../data/Store";
+import { DiscordClient, GetDiscordUser } from "../../Environment";
 import createEvent from "./events/CreateEvent";
 
 export default async (message: Discord.Message) => {
@@ -16,11 +17,15 @@ export default async (message: Discord.Message) => {
 
     if (event) {
       switch (true) {
-        case words.includes("#print"): {
+        case words.includes("#details"): {
           message.channel.send(JSON.stringify(event));
           break;
         }
         case words.includes("#rename"): {
+          break;
+        }
+        case words.includes("#rsvp"): {
+          GetDiscordUser(message.author.id).then((u) => console.log(u));
           break;
         }
       }

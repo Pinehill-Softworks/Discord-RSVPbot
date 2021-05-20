@@ -1,6 +1,6 @@
 import { DMChannel, Message, NewsChannel, TextChannel } from "discord.js";
 
-import ScheduledEvent, { ScheduledEventConstructor } from "../../../data/events/Event";
+import ScheduledEvent, { ScheduledEventConstructor } from "../../../data/entities/Event";
 import { AddSiblingChannelToGuild } from "../../ChannelManagement";
 
 export default (words: Array<string>, message: Message): string => {
