@@ -6,9 +6,9 @@ import { AddSiblingChannelToGuild } from "../../ChannelManagement";
 export default (words: Array<string>, message: Message): string => {
   if (!(message.channel as DMChannel).recipient) {
     console.log("attempting to create new event");
-    const eventIndex = words.indexOf("#event");
+    const eventIndex = words.indexOf("~event");
     if (eventIndex + 1 < words.length) {
-      let eventEndIndex = words.slice(eventIndex + 1).findIndex((i) => i.includes("#"));
+      let eventEndIndex = words.slice(eventIndex + 1).findIndex((i) => i.includes("~"));
       if (eventEndIndex < 0) {
         eventEndIndex = words.length;
       } else {
@@ -17,16 +17,16 @@ export default (words: Array<string>, message: Message): string => {
       const title = "".concat(...words.slice(eventIndex + 1, eventEndIndex).map((i) => i + " ")).trim();
       const event: ScheduledEventConstructor = { Title: title };
 
-      const dateIndex = words.indexOf("#on");
+      const dateIndex = words.indexOf("~on");
       if (dateIndex >= 0 && dateIndex + 1 < words.length) {
         if (words[dateIndex + 1] !== null) {
           event.Date = words[dateIndex + 1];
         }
       }
 
-      const descriptionIndex = words.indexOf("#for");
+      const descriptionIndex = words.indexOf("~for");
       if (descriptionIndex >= 0 && descriptionIndex + 1 < words.length) {
-        let descriptionEndIndex = words.slice(descriptionIndex + 1).findIndex((i) => i.includes("#"));
+        let descriptionEndIndex = words.slice(descriptionIndex + 1).findIndex((i) => i.includes("~"));
         if (descriptionEndIndex < 0) {
           descriptionEndIndex = words.length;
         } else {
@@ -38,10 +38,10 @@ export default (words: Array<string>, message: Message): string => {
         event.Description = description;
       }
 
-      console.log("event details to be added");
+      console.log("event details to be added", event);
       const eventEntity = new ScheduledEvent(event, (message.channel as TextChannel | NewsChannel).guild.id);
 
-      if (words.includes("#channel")) {
+      if (words.includes("~channel")) {
         console.log("attempting to create text channel for event");
         // create channel for event
         if (!(message.channel as DMChannel).recipient) {

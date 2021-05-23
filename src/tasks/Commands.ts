@@ -10,7 +10,7 @@ export default (message: Discord.Message) => {
 
   const words = message.content.split(" ");
   switch (true) {
-    case words.includes("#rsvp"): {
+    case words.includes("~rsvp"): {
       console.log("adding to guest list");
       break;
     }

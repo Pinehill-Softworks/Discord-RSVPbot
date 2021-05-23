@@ -4,7 +4,7 @@ import executeCommand from "./Commands";
 
 export default (client: Discord.Client) => {
   client.on("message", (message) => {
-    if (message.content.includes("#")) {
+    if (message.content.includes("~")) {
       executeCommand(message);
     }
   });
