@@ -5,14 +5,29 @@ import * as constants from "../CONSTANTS";
 import Event from "./entities/Event";
 import ScheduledEvent from "./entities/Event";
 import EventAccess from "./accessors/EventAccess";
+import RSVPAccess from "./accessors/RSVPAccess";
+
+const EVENTS_TABLE = `CREATE TABLE IF NOT EXISTS Events (
+  Id INTEGER PRIMARY KEY, 
+  Name TEXT NOT NULL, 
+  Title TEXT NOT NULL, 
+  Description TEXT NULL, 
+  Date TEXT NULL, 
+  ChannelID TEXT NULL
+);`;
+
+const RSVPS_TABLE = `CREATE TABLE IF NOT EXISTS RSVPs (
+  Id INTEGER PRIMARY KEY, 
+  EventID INTEGER NOT NULL, 
+  AttendeeUserID TEXT NOT NULL, 
+  AdditionalAttendees INTEGER NULL, 
+  FOREIGN KEY (EventID) REFERENCES Events (Id)
+);`;
 
 const generateTables = (db: Database) => {
   db.serialize(() => {
-    db.run(
-      "CREATE TABLE IF NOT EXISTS Events (Id INTEGER PRIMARY KEY, Name TEXT NOT NULL, Title TEXT NOT NULL, Description TEXT NULL, Date TEXT NULL, ChannelID TEXT NULL)",
-      [],
-      log("Creating event table.")
-    );
+    db.run(EVENTS_TABLE, [], log("Creating event table."));
+    db.run(RSVPS_TABLE, [], log("Creating event table."));
   });
 };
 
@@ -46,6 +61,6 @@ export default (database: string) => {
 
   return {
     Events: EventAccess(database, execute),
-    RSVPs: () => ({}),
+    RSVPs: RSVPAccess(database, execute),
   };
 };

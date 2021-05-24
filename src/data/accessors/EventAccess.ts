@@ -26,23 +26,12 @@ export default (
   },
   GetAll: (): Promise<Array<ScheduledEvent>> => {
     return execute((db, resolve, reject) => {
-      const result = new Array<ScheduledEvent>();
-      db.each(
-        "SELECT * FROM Events",
-        [],
-        (error, row) => {
-          if (error) {
-            reject(error);
-          }
-          result.push(new ScheduledEvent(row, database));
-        },
-        (error, numRows) => {
-          if (error) {
-            reject(error);
-          }
-          resolve(result);
+      db.all("SELECT * FROM Events", [], (error, rows) => {
+        if (error) {
+          reject(error);
         }
-      );
+        resolve(rows);
+      });
     });
   },
   GetByName: (name: string): Promise<ScheduledEvent> => {
