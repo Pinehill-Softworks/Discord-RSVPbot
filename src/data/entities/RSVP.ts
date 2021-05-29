@@ -1,3 +1,5 @@
+import * as Discord from "discord.js";
+import { GetDiscordUser } from "../../Environment";
 import Store from "../Store";
 import ScheduledEvent from "./Event";
 
@@ -6,7 +8,8 @@ export default class RSVP {
   private server: string;
   private _eventID: number;
   private _event?: ScheduledEvent = undefined;
-  AttendeeUserID: string;
+  private _attendeeUserID: string;
+  private _attendee?: Discord.User;
   AdditionalAttendees: number;
 
   constructor(rsvp: RSVPConstructor, server: string) {
@@ -20,7 +23,16 @@ export default class RSVP {
     } else {
       throw new Error("There maust be a specified event linked to the rsvp.");
     }
-    this.AttendeeUserID = rsvp.AttendeeUserID;
+    this._attendeeUserID = rsvp.AttendeeUserID;
+    if (rsvp.Attendee) {
+      this._attendee = rsvp.Attendee;
+      this._attendeeUserID = rsvp.Attendee.id;
+    } else if (rsvp.AttendeeUserID) {
+      this._attendeeUserID = rsvp.AttendeeUserID;
+      this.getUserFromDiscord(rsvp.AttendeeUserID);
+    } else {
+      throw new Error("There must be a specified user attending the event.");
+    }
     this.AdditionalAttendees = rsvp.AdditionalAttendees || 0;
     this._id = rsvp.Id || -1;
     if (this._id <= 0) {
@@ -33,7 +45,12 @@ export default class RSVP {
   }
 
   async getEvent() {
-    if (this._event) return this._event;
+    if (this._event)
+      new Promise((resolve, reject) =>
+        resolve(() => {
+          return this._event;
+        })
+      );
     else return await this.getEventFromDB(this._eventID);
   }
 
@@ -51,6 +68,19 @@ export default class RSVP {
     this.commitChanges();
   }
 
+  async getAttendee(): Promise<Discord.User> {
+    if (this._attendee) return new Promise((resolve, reject) => resolve(this._attendee as Discord.User));
+    else {
+      await this.getUserFromDiscord(this._attendeeUserID);
+      // @ts-ignore
+      return this._attendee;
+    }
+  }
+
+  get AttendeeID() {
+    return this._attendeeUserID;
+  }
+
   private async getEventFromDB(id: number | string) {
     if (typeof id === "number") {
       this._event = await Store(this.server).Events.GetByID(id);
@@ -61,6 +91,11 @@ export default class RSVP {
       }
     }
     this._eventID = this._event.Id;
+  }
+
+  private async getUserFromDiscord(id: string) {
+    this._attendee = await GetDiscordUser(id);
+    this._attendeeUserID = this._attendee.id;
   }
 
   private commitChanges() {
@@ -81,5 +116,6 @@ export interface RSVPConstructor {
   EventID?: number | string;
   Event?: ScheduledEvent;
   AttendeeUserID: string;
+  Attendee?: Discord.User;
   AdditionalAttendees?: number;
 }

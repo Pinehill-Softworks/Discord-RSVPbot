@@ -11,12 +11,12 @@ export default (
       db.serialize(() => {
         db.run("INSERT INTO RSVPs (EventID, AttendeeUserID, AdditionalAttendees) VALUES (?1, ?2, ?3)", {
           1: rsvp.EventID,
-          2: rsvp.AttendeeUserID,
+          2: rsvp.AttendeeID,
           3: rsvp.AdditionalAttendees,
         });
         db.get(
           "SELECT Id FROM RSVPs WHERE EventID = ?1 AND AttendeeUserID = ?2",
-          { 1: rsvp.EventID, 2: rsvp.AttendeeUserID },
+          { 1: rsvp.EventID, 2: rsvp.AttendeeID },
           (error, row) => {
             if (error) {
               reject(error);
