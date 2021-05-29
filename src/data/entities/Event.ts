@@ -13,15 +13,20 @@ class ScheduledEvent {
   constructor(values: ScheduledEventConstructor, server: string) {
     if (values.Title) {
       this._id = values.Id || -1;
-      // @ts-ignore : TS doesnt have replaceAll?
-      this.Name = values.name || values.Title.trim().toLowerCase().replaceAll(" ", "-");
+      this.Name =
+        values.Name ||
+        values.Title.trim()
+          .toLowerCase()
+          // @ts-ignore : TS doesnt have replaceAll?
+          .replaceAll(/[^\w\s-]/gi, "")
+          .replaceAll(" ", "-");
       this.Title = values.Title as string;
       this.Description = values.Description;
       const eventDate = DateTime.fromISO(values.Date || "");
       this.Date = !eventDate.invalidReason ? eventDate : undefined;
       this.ChannelID = values.ChannelID;
       this.Server = server;
-
+      console.log(this.Name);
       if (this._id <= 0) {
         this.commitChanges();
       }
