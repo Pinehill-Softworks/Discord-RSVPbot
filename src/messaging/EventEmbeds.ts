@@ -2,12 +2,14 @@ import { MessageEmbed, User } from "discord.js";
 import ScheduledEvent from "../data/entities/Event";
 import * as colors from "../settings/MessageEmbedColors";
 
-export const EventDetails = (event: ScheduledEvent): MessageEmbed => {
+export const EventDetails = async (event: ScheduledEvent): Promise<MessageEmbed> => {
   const embed = new MessageEmbed();
   embed.setTitle(event.Title);
   embed.setColor(colors.PRIMARRY);
+  embed.setAuthor(`Hosted By: @${(await event.getHostUser())?.username}`);
   embed.setDescription(event.Description);
-  embed.addField("On", event.Date?.toFormat("DDDD") || "TBD");
+  embed.addField("When", event.Date?.toFormat("DDDD") || "TBD");
+  embed.addField("Where", event.Location?.Name || "TBD");
   return embed;
 };
 

@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 
 export default (message: Discord.Message) => {
+  console.log(message.content);
   switch (true) {
     case message.content.includes("~ping"): {
       console.log("recieved ping");

@@ -8,13 +8,18 @@ export default (
   Add: (event: ScheduledEvent): Promise<number> => {
     return execute((db, resolve, reject) => {
       db.serialize(() => {
-        db.run("INSERT INTO Events (Name, Title, Description, Date, ChannelID) VALUES (?1, ?2, ?3, ?4, ?5)", {
-          1: event.Name,
-          2: event.Title,
-          3: event.Description,
-          4: event.Date && !event.Date.invalidReason ? event.Date.toISO() : "",
-          5: event.ChannelID,
-        });
+        db.run(
+          "INSERT INTO Events (Name, Title, HostID, Active, Description, Date, ChannelID) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+          {
+            1: event.Name,
+            2: event.Title,
+            3: event.HostID,
+            4: event.Active ? 1 : 0,
+            5: event.Description,
+            6: event.Date && !event.Date.invalidReason ? event.Date.toISO() : "",
+            7: event.ChannelID,
+          }
+        );
         db.get("SELECT Id FROM Events WHERE Name = ?", [event.Name], (error, row) => {
           if (error) {
             reject(error);
@@ -67,14 +72,15 @@ export default (
   Update: (event: ScheduledEvent): Promise<Boolean> => {
     return execute((db, resolve, reject) => {
       db.run(
-        "UPDATE Events SET Name = ?1, Title = ?2, Description = ?3, Date = ?4, ChannelID = ?5 WHERE Id = ?6",
+        "UPDATE Events SET Name = ?1, Title = ?2, Description = ?3, Active = ?4, Date = ?5, ChannelID = ?6 WHERE Id = ?7",
         {
           1: event.Name,
           2: event.Title,
           3: event.Description,
-          4: event.Date && !event.Date.invalidReason ? event.Date.toISO() : "",
-          5: event.ChannelID,
-          6: event.Id,
+          4: event.Active ? 1 : 0,
+          5: event.Date && !event.Date.invalidReason ? event.Date.toISO() : "",
+          6: event.ChannelID,
+          7: event.Id,
         },
         (error) => {
           if (error) {

@@ -6,14 +6,19 @@ import Event from "./entities/Event";
 import ScheduledEvent from "./entities/Event";
 import EventAccess from "./accessors/EventAccess";
 import RSVPAccess from "./accessors/RSVPAccess";
+import LocationAccess from "./accessors/LocationAccess";
 
 const EVENTS_TABLE = `CREATE TABLE IF NOT EXISTS Events (
   Id INTEGER PRIMARY KEY, 
   Name TEXT NOT NULL, 
   Title TEXT NOT NULL, 
+  HostID TEXT NOT NULL, 
+  Active INTEGER NOT NULL, 
   Description TEXT NULL, 
   Date TEXT NULL, 
-  ChannelID TEXT NULL
+  ChannelID TEXT NULL,
+  LocationID INTEGER NULL,
+  FOREIGN KEY (LocationID) REFERENCES Locations (Id)
 );`;
 
 const RSVPS_TABLE = `CREATE TABLE IF NOT EXISTS RSVPs (
@@ -24,10 +29,19 @@ const RSVPS_TABLE = `CREATE TABLE IF NOT EXISTS RSVPs (
   FOREIGN KEY (EventID) REFERENCES Events (Id)
 );`;
 
+const LOCATIONS_TABLE = `CREATE TABLE IF NOT EXISTS Locations (
+  Id INTEGER PRIMARY KEY,
+  StringID TEXT NOT NULL,
+  Name TEXT NOT NULL,
+  Address TEXT NULL,
+  Details TEXT NULL
+)`;
+
 const generateTables = (db: Database) => {
   db.serialize(() => {
     db.run(EVENTS_TABLE, [], log("Creating event table."));
-    db.run(RSVPS_TABLE, [], log("Creating event table."));
+    db.run(RSVPS_TABLE, [], log("Creating RSVP table."));
+    db.run(LOCATIONS_TABLE, [], log("Creating locations table."));
   });
 };
 
@@ -62,5 +76,6 @@ export default (database: string) => {
   return {
     Events: EventAccess(database, execute),
     RSVPs: RSVPAccess(database, execute),
+    Locations: LocationAccess(database, execute),
   };
 };

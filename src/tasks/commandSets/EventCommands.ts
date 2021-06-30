@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 
 import Store from "../../data/Store";
+import { ErrorMessage } from "../../messaging/ErrorEmbeds";
 import createEvent from "./events/CreateEvent";
 import EventInteraction from "./events/EventInteraction";
 
@@ -18,19 +19,18 @@ export default async (message: Discord.Message) => {
       const eventIndex = words.indexOf("~event");
       if (eventIndex >= 0 && eventIndex + 1 < words.length) {
         event = await Store(server).Events.GetByName(words[eventIndex + 1]);
-
-        console.log(event);
-        console.log(words.indexOf("~new"));
         if (event) {
           const result = await EventInteraction(words, message, event);
           message.channel.send(result);
         } else if (words.indexOf("~new") >= 0) {
           console.log("creating new event");
-          const result = createEvent(words, message);
+          const result = await createEvent(words, message);
           message.channel.send(result);
         } else {
           message.channel.send(
-            "Specified name does not amtch any existing event names. use '~events' to list active events or '~new ~event' to create a new event"
+            ErrorMessage(
+              "Specified name does not amtch any existing event names. use '~events' to list active events or '~new ~event' to create a new event"
+            )
           );
         }
       }

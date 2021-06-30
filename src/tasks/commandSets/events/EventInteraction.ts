@@ -68,6 +68,8 @@ export default async (
         { Event: event, AttendeeUserID: user.id },
         (message.channel as TextChannel | NewsChannel).guild.id
       );
+      const experiment = RSVP;
+      console.log(experiment.prototype);
       return JSON.stringify(rsvp);
     }
   }

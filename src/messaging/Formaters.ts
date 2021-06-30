@@ -1,4 +1,4 @@
-import { EmbedFieldData, MessageEmbed } from "discord.js";
+import { EmbedFieldData, MessageEmbed, User } from "discord.js";
 
 // export interface TableHeader {
 //   name: string;

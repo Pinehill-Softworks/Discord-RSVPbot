@@ -1,14 +1,21 @@
+import { User } from "discord.js";
 import { DateTime } from "luxon";
+import { GetDiscordUser } from "../../Environment";
 import Store from "../Store";
+import Location from "../entities/Location";
 
 class ScheduledEvent {
   private _id: number;
   private Server: string;
   Name: string;
   Title: string;
+  HostID: string;
+  private _host?: User;
+  Active: boolean;
   Description?: string;
   Date?: DateTime;
   ChannelID?: string;
+  Location?: Location;
 
   constructor(values: ScheduledEventConstructor, server: string) {
     if (values.Title) {
@@ -21,6 +28,17 @@ class ScheduledEvent {
           .replaceAll(/[^\w\s-]/gi, "")
           .replaceAll(" ", "-");
       this.Title = values.Title as string;
+      if (values.Host) {
+        this._host = values.Host;
+        this.HostID = values.Host.id;
+      } else if (values.HostID) {
+        this.HostID = values.HostID;
+        this.getHostUserFromDiscord();
+      } else {
+        throw new Error("The event must have a host user.");
+      }
+      if (typeof values.Active === "number") this.Active = values.Active === 1 ? true : false;
+      else this.Active = values.Active || true;
       this.Description = values.Description;
       const eventDate = DateTime.fromISO(values.Date || "");
       this.Date = !eventDate.invalidReason ? eventDate : undefined;
@@ -73,6 +91,13 @@ class ScheduledEvent {
     return `${this.Title}${dateToPrint ? `-${dateToPrint}` : ""}`;
   }
 
+  async getHostUser() {
+    if (!this._host) {
+      await this.getHostUserFromDiscord();
+    }
+    return this._host;
+  }
+
   commitChanges() {
     if (this.Id <= 0) {
       Store(this.Server)
@@ -82,15 +107,23 @@ class ScheduledEvent {
       Store(this.Server).Events.Update(this);
     }
   }
+
+  private async getHostUserFromDiscord() {
+    this._host = await GetDiscordUser(this.HostID);
+  }
 }
 
 export interface ScheduledEventConstructor {
   Id?: number;
   Name?: string;
+  HostID: string;
+  Host?: User;
+  Active?: boolean | number;
   Title: string;
   Description?: string;
   Date?: string;
   ChannelID?: string;
+  Location?: Location;
 }
 
 export const GetEventByID = async (server: string, id: number) => await Store(server).Events.GetByID(id);

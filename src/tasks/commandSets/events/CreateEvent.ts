@@ -1,9 +1,12 @@
-import { DMChannel, Message, NewsChannel, TextChannel } from "discord.js";
+import { DMChannel, Message, MessageEmbed, NewsChannel, TextChannel } from "discord.js";
+import { CollectRSVPReactions } from "../../../data/collectors/ReactionCollection";
 
 import ScheduledEvent, { ScheduledEventConstructor } from "../../../data/entities/Event";
+import { ErrorMessage } from "../../../messaging/ErrorEmbeds";
+import { EventDetails } from "../../../messaging/EventEmbeds";
 import { AddSiblingChannelToGuild } from "../../ChannelManagement";
 
-export default (words: Array<string>, message: Message): string => {
+export default async (words: Array<string>, message: Message): Promise<MessageEmbed> => {
   if (!(message.channel as DMChannel).recipient) {
     console.log("attempting to create new event");
     const eventIndex = words.indexOf("~event");
@@ -15,7 +18,7 @@ export default (words: Array<string>, message: Message): string => {
         eventEndIndex += eventIndex + 1;
       }
       const title = "".concat(...words.slice(eventIndex + 1, eventEndIndex).map((i) => i + " ")).trim();
-      const event: ScheduledEventConstructor = { Title: title };
+      const event: ScheduledEventConstructor = { Title: title, HostID: message.author.id };
 
       const dateIndex = words.indexOf("~on");
       if (dateIndex >= 0 && dateIndex + 1 < words.length) {
@@ -41,24 +44,27 @@ export default (words: Array<string>, message: Message): string => {
       console.log("event details to be added", event);
       const eventEntity = new ScheduledEvent(event, (message.channel as TextChannel | NewsChannel).guild.id);
 
-      if (words.includes("~channel")) {
-        console.log("attempting to create text channel for event");
-        // create channel for event
-        if (!(message.channel as DMChannel).recipient) {
-          const eventChannel = AddSiblingChannelToGuild(
-            message.channel as TextChannel | NewsChannel,
-            eventEntity.getChannelName()
-          ).then((channel) => {
-            console.log("generated channel: " + channel);
-            eventEntity.setChannelID(channel.id);
-          });
-        }
+      console.log("attempting to create text channel for event");
+      // create channel for event
+      if (!(message.channel as DMChannel).recipient) {
+        const eventChannel = AddSiblingChannelToGuild(
+          message.channel as TextChannel | NewsChannel,
+          eventEntity.getChannelName()
+        ).then((channel) => {
+          console.log("generated channel: " + channel);
+          eventEntity.setChannelID(channel.id);
+        });
       }
-      return JSON.stringify(event);
+
+      console.log("starting to track reactions.");
+      CollectRSVPReactions(message);
+
+      console.log(eventEntity);
+      return await EventDetails(eventEntity);
     } else {
-      return "Please specify an event to be added or changed.";
+      return ErrorMessage("Please specify an event to be added or changed.");
     }
   } else {
-    return "Events cannot be created in a DM channel.";
+    return ErrorMessage("Events cannot be created in a DM channel.");
   }
 };
